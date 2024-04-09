@@ -1,5 +1,4 @@
-module github.com/dev-chicken/study-golang/gin/golang-gin-study
-
+module github.com/seanlee0923/first-gin
 go 1.22.0
 
 require (
