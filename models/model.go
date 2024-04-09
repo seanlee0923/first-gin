@@ -4,15 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type Post struct {
-	id      uint
-	Title   string
-	Content string
+	Id      uint
+	Title   string `json:"title"`
+	Content string `json:"content"`
 	Regdate time.Time
 }
 
@@ -35,8 +37,9 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func Posts() {
+func Posts() []Post {
 	db, err := connectDB()
+
 	if err != nil {
 		panic(err.Error())
 	}
@@ -49,18 +52,39 @@ func Posts() {
 
 	defer rows.Close()
 
+	var postList []Post
 	for rows.Next() {
-		var id uint
-		var title string
-		var content string
-		var regdate time.Time
-
+		var post Post
+		rows.Scan(&post.Id, &post.Title, &post.Content, &post.Regdate)
 		if err != nil {
 			panic(err.Error())
 		}
-		fmt.Println("id: ", id)
-		fmt.Println("title: ", title)
-		fmt.Println("content: ", content)
-		fmt.Println("regdate: ", regdate)
+		log.Println("Id: ", post.Id)
+		log.Println("Id: ", post.Title)
+		log.Println("Id: ", post.Content)
+		log.Println("Id: ", post.Regdate)
+		postList = append(postList, post)
 	}
+	return postList
+}
+
+func WritePost(c *gin.Context) {
+	var post Post
+	if err := c.ShouldBindJSON(&post); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db, err := connectDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
+	_, err = db.Exec("INSERT INTO post (title, content) VALUES (?, ?)", post.Title, post.Content)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Post Created Successfully"})
 }

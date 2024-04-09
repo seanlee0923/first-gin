@@ -18,9 +18,17 @@ func DefaultRouter() *gin.Engine {
 
 	router.GET("/posts", posts)
 
+	router.POST("/posts", writePost)
+
 	return router
 }
 
 func posts(c *gin.Context) {
-	models.Posts()
+	result := models.Posts()
+
+	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
+}
+
+func writePost(c *gin.Context) {
+	models.WritePost(c)
 }
