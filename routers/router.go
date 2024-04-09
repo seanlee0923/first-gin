@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/seanlee0923/first-gin/models"
 )
 
 func DefaultRouter() *gin.Engine {
@@ -15,11 +16,11 @@ func DefaultRouter() *gin.Engine {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 
-	router.GET("/posts", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hi",
-		})
-	})
+	router.GET("/posts", posts)
 
 	return router
+}
+
+func posts(c *gin.Context) {
+	models.Posts()
 }
