@@ -23,6 +23,8 @@ func DefaultRouter() *gin.Engine {
 
 	router.GET("/sites", sites)
 
+	router.POST("/sites", writeSite)
+
 	return router
 }
 
@@ -40,4 +42,8 @@ func sites(c *gin.Context) {
 	result := site.Sites()
 
 	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
+}
+
+func writeSite(c *gin.Context) {
+	site.WriteSite(c)
 }
