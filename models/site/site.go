@@ -1,14 +1,13 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/seanlee0923/first-gin/models"
 )
 
 type Site struct {
@@ -25,29 +24,10 @@ type Site struct {
 	CreatedAt      time.Time
 }
 
-func connectDB() (*sql.DB, error) {
-	username := "root"
-	password := "master"
-	dbname := "gin1"
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", username, password, dbname))
-	if err != nil {
-		return nil, err
-	}
-
-	// 데이터베이스 연결 테스트
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("Connected to the database")
-	return db, nil
-}
-
 func Sites() []Site {
 	var sites []Site
 
-	db, err := connectDB()
+	db, err := models.ConnectDB()
 	if err != nil {
 		panic("hi")
 	}
@@ -74,12 +54,14 @@ func Sites() []Site {
 
 func WriteSite(c *gin.Context) {
 	var site Site
+
 	if err := c.ShouldBindJSON(&site); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Println(site.SiteName)
+	db, err := models.ConnectDB()
 
-	db, err := connectDB()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -92,6 +74,7 @@ func WriteSite(c *gin.Context) {
 		site.SiteUsername, site.SitePassword,
 		site.SiteOSName, site.SiteOSPassword,
 		site.IsBasic)
+
 	if err != nil {
 		panic(err.Error())
 	}

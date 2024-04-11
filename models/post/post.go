@@ -1,14 +1,13 @@
 package post
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/seanlee0923/first-gin/models"
 )
 
 type Post struct {
@@ -18,29 +17,10 @@ type Post struct {
 	Regdate time.Time
 }
 
-func connectDB() (*sql.DB, error) {
-	username := "root"
-	password := "master"
-	dbname := "gin1"
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s", username, password, dbname))
-	if err != nil {
-		return nil, err
-	}
-
-	// 데이터베이스 연결 테스트
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("Connected to the database")
-	return db, nil
-}
-
 func Posts() []Post {
 	var postList []Post
 
-	db, err := connectDB()
+	db, err := models.ConnectDB()
 
 	if err != nil {
 		panic(err.Error())
@@ -72,7 +52,7 @@ func Posts() []Post {
 func PostBy(id uint) Post {
 	var post Post
 
-	db, err := connectDB()
+	db, err := models.ConnectDB()
 
 	if err != nil {
 		panic(err.Error())
@@ -97,7 +77,7 @@ func WritePost(c *gin.Context) {
 		return
 	}
 
-	db, err := connectDB()
+	db, err := models.ConnectDB()
 	if err != nil {
 		panic(err.Error())
 	}
