@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/seanlee0923/first-gin/models"
+	post "github.com/seanlee0923/first-gin/models/post"
+	site "github.com/seanlee0923/first-gin/models/site"
 )
 
 func DefaultRouter() *gin.Engine {
@@ -20,15 +21,23 @@ func DefaultRouter() *gin.Engine {
 
 	router.POST("/posts", writePost)
 
+	router.GET("/sites", sites)
+
 	return router
 }
 
 func posts(c *gin.Context) {
-	result := models.Posts()
+	result := post.Posts()
 
 	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
 }
 
 func writePost(c *gin.Context) {
-	models.WritePost(c)
+	post.WritePost(c)
+}
+
+func sites(c *gin.Context) {
+	result := site.Sites()
+
+	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
 }
