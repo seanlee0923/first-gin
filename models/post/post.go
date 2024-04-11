@@ -38,6 +38,8 @@ func connectDB() (*sql.DB, error) {
 }
 
 func Posts() []Post {
+	var postList []Post
+
 	db, err := connectDB()
 
 	if err != nil {
@@ -52,7 +54,6 @@ func Posts() []Post {
 
 	defer rows.Close()
 
-	var postList []Post
 	for rows.Next() {
 		var post Post
 		rows.Scan(&post.Id, &post.Title, &post.Content, &post.Regdate)
@@ -66,6 +67,27 @@ func Posts() []Post {
 		postList = append(postList, post)
 	}
 	return postList
+}
+
+func PostBy(id uint) Post {
+	var post Post
+
+	db, err := connectDB()
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	defer db.Close()
+
+	row, err := db.Query("SELECT * FROM post WHERE ID = ?", id)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	row.Scan(&post.Id, &post.Title, &post.Content, &post.Regdate)
+
+	return post
 }
 
 func WritePost(c *gin.Context) {
