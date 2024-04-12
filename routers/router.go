@@ -17,15 +17,31 @@ func DefaultRouter() *gin.Engine {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 
-	router.GET("/posts", posts)
-
 	router.POST("/posts", writePost)
 
-	router.GET("/sites", sites)
+	router.GET("/posts", posts)
+
+	router.GET("/post", postBy)
+
+	router.POST("/post-update", updatePost)
+
+	router.POST("/post-delete", deletePostBy)
 
 	router.POST("/sites", writeSite)
 
+	router.GET("/sites", sites)
+
+	router.GET("/site", getSiteBy)
+
+	router.POST("/site-update", updateSite)
+
+	router.POST("/site-delete", deleteSiteBy)
+
 	return router
+}
+
+func writePost(c *gin.Context) {
+	post.WritePost(c)
 }
 
 func posts(c *gin.Context) {
@@ -34,8 +50,22 @@ func posts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
 }
 
-func writePost(c *gin.Context) {
-	post.WritePost(c)
+func postBy(c *gin.Context) {
+	result := post.PostBy(2)
+
+	c.JSON(http.StatusOK, gin.H{"message": "단건 조회 성공", "result": result})
+}
+
+func updatePost(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "업데이트 해보자"})
+}
+
+func deletePostBy(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "삭제도 해보자"})
+}
+
+func writeSite(c *gin.Context) {
+	site.WriteSite(c)
 }
 
 func sites(c *gin.Context) {
@@ -44,6 +74,14 @@ func sites(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "조회 성공", "resultArray": result})
 }
 
-func writeSite(c *gin.Context) {
-	site.WriteSite(c)
+func getSiteBy(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "단건조회 테스트"})
+}
+
+func updateSite(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "업데이트 테스트"})
+}
+
+func deleteSiteBy(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "삭제 테스트"})
 }
