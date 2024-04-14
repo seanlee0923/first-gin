@@ -22,7 +22,7 @@ func DefaultRouter() *gin.Engine {
 
 	router.GET("/posts", posts)
 
-	router.GET("/post", postBy)
+	router.GET("/post/:id", postBy)
 
 	router.POST("/post-update/:id", updatePost)
 
@@ -52,7 +52,8 @@ func posts(c *gin.Context) {
 }
 
 func postBy(c *gin.Context) {
-	result := post.PostBy(2)
+	postId, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	result := post.PostBy(uint(postId))
 
 	c.JSON(http.StatusOK, gin.H{"message": "단건 조회 성공", "result": result})
 }
