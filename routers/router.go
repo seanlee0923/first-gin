@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	post "github.com/seanlee0923/first-gin/models/post"
@@ -23,7 +24,7 @@ func DefaultRouter() *gin.Engine {
 
 	router.GET("/post", postBy)
 
-	router.POST("/post-update", updatePost)
+	router.POST("/post-update/:id", updatePost)
 
 	router.POST("/post-delete", deletePostBy)
 
@@ -57,7 +58,14 @@ func postBy(c *gin.Context) {
 }
 
 func updatePost(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "업데이트 해보자"})
+	var changedPost post.Post
+	postId, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err := c.ShouldBindJSON(&changedPost); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result := post.UpdatePost(changedPost, postId)
+	c.JSON(http.StatusOK, gin.H{"message": "업데이트 해보자", "result": result})
 }
 
 func deletePostBy(c *gin.Context) {

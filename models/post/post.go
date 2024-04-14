@@ -17,6 +17,27 @@ type Post struct {
 	Regdate time.Time
 }
 
+func WritePost(c *gin.Context) {
+	var post Post
+	if err := c.ShouldBindJSON(&post); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db, err := models.ConnectDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
+	_, err = db.Exec("INSERT INTO post (title, content) VALUES (?, ?)", post.Title, post.Content)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Post Created Successfully"})
+}
+
 func Posts() []Post {
 	var postList []Post
 
@@ -70,23 +91,20 @@ func PostBy(id uint) Post {
 	return post
 }
 
-func WritePost(c *gin.Context) {
-	var post Post
-	if err := c.ShouldBindJSON(&post); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+func UpdatePost(post Post, postId uint64) (id uint) {
+	db, err := models.ConnectDB()
+
+	if err != nil {
+		panic("DB Connect Error...")
 	}
 
-	db, err := models.ConnectDB()
-	if err != nil {
-		panic(err.Error())
-	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO post (title, content) VALUES (?, ?)", post.Title, post.Content)
+	_, err = db.Exec("UPDATE post SET Title = ?, Content = ? WHERE id = ?", &post.Title, &post.Content, postId)
+
 	if err != nil {
-		panic(err.Error())
+		panic("DB Exec Error...")
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Post Created Successfully"})
+	return uint(postId)
 }
