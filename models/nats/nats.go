@@ -40,4 +40,6 @@ func makeNatsClient() *NatsClient {
 		UniqueReplyTo: make(map[string]string),
 		ReqTimeout:    time.Second * 5,
 	}
+
+	return connect
 }
