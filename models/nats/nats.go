@@ -7,24 +7,14 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-type natsRequest struct {
-	postId  uint
-	message string
+type Post struct {
+	Id      uint
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Regdate time.Time
 }
 
-type natsResponse struct {
-	Conn         *nats.Conn
-	Subscription *nats.Subscription
-}
-
-type NatsClient struct {
-	Conn          *nats.Conn
-	Subs          map[string]*nats.Subscription
-	UniqueReplyTo map[string]string
-	ReqTimeout    time.Duration
-}
-
-func makeNatsClient() *NatsClient {
+func makeNatsClient() *nats.Conn {
 	natsName := os.Getenv("NATS_HOSTNAME")
 	natsPort := os.Getenv("NATS_PORT")
 
@@ -34,12 +24,6 @@ func makeNatsClient() *NatsClient {
 	if err != nil {
 		panic(err)
 	}
-	connect := &NatsClient{
-		Conn:          natsConn,
-		Subs:          make(map[string]*nats.Subscription),
-		UniqueReplyTo: make(map[string]string),
-		ReqTimeout:    time.Second * 5,
-	}
 
-	return connect
+	return natsConn
 }
